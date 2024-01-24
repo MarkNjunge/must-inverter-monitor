@@ -1,1 +1,4 @@
 run.bat
+.env
+logs/*.log
+logs/*.log.*
