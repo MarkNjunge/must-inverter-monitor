@@ -16,7 +16,7 @@ logging.basicConfig(
         logging.StreamHandler(),
         RotatingFileHandler(
             filename="logs/must_inverter_monitor.log",
-            maxBytes=10_000_000,
+            maxBytes=1_000_000,
             backupCount=10,
         ),
     ],
