@@ -2,3 +2,5 @@ run.bat
 .env
 logs/*.log
 logs/*.log.*
+.idea
+.venv
