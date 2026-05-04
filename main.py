@@ -35,6 +35,7 @@ INFLUX_TOKEN = os.getenv("INFLUX_TOKEN")
 
 # Registers to retrieve data for
 register_map = {
+    # Block 25xxx (Main Stats)
     25201: [
         "workState",
         "Work state",
@@ -83,37 +84,31 @@ register_map = {
 
     25245: ["AccumulatedChargerPowerM", "AccumulatedChargerPowerM", 1, "MWh"],
     25246: ["AccumulatedChargerPower", "AccumulatedChargerPower", 1, "kWh"],
-
     25247: ["AccumulatedDischargerPowerM", "AccumulatedDischargerPowerM", 1, "MWh"],
     25248: ["AccumulatedDischargerPower", "AccumulatedDischargerPower", 1, "kWh"],
-
     25249: ["AccumulatedBuyPowerM", "AccumulatedBuyPowerM", 1, "MWh"],
     25250: ["AccumulatedBuyPower", "AccumulatedBuyPower", 1, "kWh"],
-
     25251: ["AccumulatedSellPowerM", "AccumulatedSellPowerM", 1, "MWh"],
     25252: ["AccumulatedSellPower", "AccumulatedSellPower", 1, "kWh"],
-
     25253: ["AccumulatedLoadPowerM", "AccumulatedLoadPowerM", 1, "MWh"],
     25254: ["AccumulatedLoadPower", "AccumulatedLoadPower", 1, "kWh"],
-
     25255: ["AccumulatedSelfUsePowerM", "AccumulatedSelfUsePowerM", 1, "MWh"],
     25256: ["AccumulatedSelfUsePower", "AccumulatedSelfUsePower", 1, "kWh"],
-
     25257: ["AccumulatedPvSellPowerM", "AccumulatedPvSellPowerM", 1, "MWh"],
     25258: ["AccumulatedPvSellPower", "AccumulatedPvSellPower", 1, "kWh"],
-
     25259: ["AccumulatedGridChargerPowerM", "AccumulatedGridChargerPowerM", 1, "MWh"],
     25260: ["AccumulatedGridChargerPower", "AccumulatedGridChargerPower", 1, "kWh"],
-
     25261: ["InverterErrorMessage", "InverterErrorMessage", 1, ""],
+
     25265: ["InverterWarningMessage", "InverterWarningMessage", 1, ""],
-
-
 
     25273: ["batteryPower", "Battery power", 1, "W"],
     25274: ["batteryCurrent", "Battery current", 1, "A"],
 
     25279: ["ArrowFlag","Arrow Flag",1,""],
+
+
+    # Block 20xxx (Config/Mode)
     20109: [
         "EnergyUseMode",
         "Energy use mode",
@@ -140,7 +135,6 @@ register_map = {
             3: "GEN",
         },
     ],
-
     20112: [
         "SolarUseAim",
         "SolarUse Aim",
@@ -152,13 +146,17 @@ register_map = {
         },
     ],
     20113: ["Inv_max_discharger_cur", "Inverter max discharger current", 0.1, "A"],
+
     20118: ["BatStopDischargingV", "Battery stop discharging voltage", 0.1, "V"],
     20119: ["BatStopChargingV", "Battery stop charging voltage", 0.1, "V"],
+
     20125: ["GridMaxChargerCurSet", "Grid max charger current set", 0.1, "A"],
+
     20127: ["BatLowVoltage", "Battery low voltage", 0.1, "V"],
     20128: ["BatHighVoltage", "Battery high voltage", 0.1, "V"],
 
 
+    # Block 15xxx (MPPT/Charger)
     15201: [
         "ChargerWorkstate",
         "Charger Workstate",
@@ -171,7 +169,6 @@ register_map = {
             3: "Stop",
         },
     ],
-
     15202: [
         "MpptState",
         "Mppt State",
@@ -183,7 +180,6 @@ register_map = {
             2: "Current limiting",
         },
     ],
-
     15203: [
         "ChargingState",
         "Charging State",
@@ -197,33 +193,30 @@ register_map = {
         },
     ],
 
-  15205: ["PvVoltage", "Pv. Voltage", 0.1, "V"],
-  15206: ["chBatteryVoltage", "Ch. Battery Voltage", 0.1, "V"],
-  15207: ["chChargerCurrent", "Ch. Charger Current", 0.1, "A"],
-  15208: ["ChargerPower", "Ch. Charger Power", 1, "W"],
-  15209: ["RadiatorTemperature", "Ch. Radiator Temperature", 1, "C"],
-  15210: ["ExternalTemperature", "Ch. External Temperature", 1, "C"],
-  15211: ["BatteryRelay", "Battery Relay", 1, ""],
-  15212: ["PvRelay", "Pv. Relay", 1, ""],
-  15213: ["ChargerErrorMessage", "Charger Error Message", 1, ""],
-  15214: ["ChargerWarningMessage", "Charger Warning Message", 1, ""],
-  15215: ["BattVolGrade", "BattVolGrade", 1, "V"],
-  15216: ["RatedCurrent", "Rated Current", 0.1, "A"],
+    15205: ["PvVoltage", "Pv. Voltage", 0.1, "V"],
+    15206: ["chBatteryVoltage", "Ch. Battery Voltage", 0.1, "V"],
+    15207: ["chChargerCurrent", "Ch. Charger Current", 0.1, "A"],
+    15208: ["ChargerPower", "Ch. Charger Power", 1, "W"],
+    15209: ["RadiatorTemperature", "Ch. Radiator Temperature", 1, "C"],
+    15210: ["ExternalTemperature", "Ch. External Temperature", 1, "C"],
+    15211: ["BatteryRelay", "Battery Relay", 1, ""],
+    15212: ["PvRelay", "Pv. Relay", 1, ""],
+    15213: ["ChargerErrorMessage", "Charger Error Message", 1, ""],
+    15214: ["ChargerWarningMessage", "Charger Warning Message", 1, ""],
+    15215: ["BattVolGrade", "BattVolGrade", 1, "V"],
+    15216: ["RatedCurrent", "Rated Current", 0.1, "A"],
+    15217: ["AccumulatedPowerM", "Accumulated PowerM", 1 , "MWh"],
+    15218: ["AccumulatedPower", "Accumulated Power", 1 , "kWh"],
+    15219: ["AccumulatedTimeDay", "Accumulated Time day", 1 , "d"],
 
-  15217: ["AccumulatedPowerM", "Accumulated PowerM", 1 , "MWh"],
-  15218: ["AccumulatedPower", "Accumulated Power", 1 , "kWh"],
-  15219: ["AccumulatedTimeDay", "Accumulated Time day", 1 , "d"],
-
-# Get data from External BMS
-  109: ["BMS_Battery_Voltage", "BMS Battery Voltage", 0.1 , "V"],
-  110: ["BMS_Battery_Current", "BMS Battery Current", 0.1 , "A"],
-  111: ["BMS_Battery_Temperature", "BMS Battery Temperature", 1 , "C"],
-  112: ["BMS_Battery_Errors", "BMS Battery Error", 1 , ""],
-  113: ["BMS_Battery_SOC", "BMS Battery SOC", 1 , "%"],
-  114: ["BMS_Battery_SOH", "BMS Battery SOH", 1 , "%"]
-
+    # Block 1xx (External BMS)
+    109: ["BMS_Battery_Voltage", "BMS Battery Voltage", 0.1 , "V"],
+    110: ["BMS_Battery_Current", "BMS Battery Current", 0.1 , "A"],
+    111: ["BMS_Battery_Temperature", "BMS Battery Temperature", 1 , "C"],
+    112: ["BMS_Battery_Errors", "BMS Battery Error", 1 , ""],
+    113: ["BMS_Battery_SOC", "BMS Battery SOC", 1 , "%"],
+    114: ["BMS_Battery_SOH", "BMS Battery SOH", 1 , "%"]
 }
-
 
 
 def read_register_values(i, startreg, count):
@@ -241,8 +234,8 @@ def read_register_values(i, startreg, count):
             else:
                 r_value = str(round(r * r_unit, 2))
 
-            # convert from offset val fix for Inverter power owerload
-            if register_id == 25213 or register_id == 25273 or register_id == 25274  or register_id == 25214 or register_id == 110 :
+            # convert from offset val fix for Inverter power overload
+            if register_id == 25213 or register_id == 25273 or register_id == 25274 or register_id == 25214 or register_id == 110 :
                 if float(r_value) > 32000 :
                    r_value =- abs(float(r_value)- 65536)
 
@@ -281,11 +274,33 @@ while infinite:
     i = minimalmodbus.Instrument(SERPORT, 4)
     i.serial.timeout = SERTIMEOUT
     i.serial.baudrate = SERBAUD
-    stats_line_all = read_register_values(i, 15201, 19)
-    stats_line_all += "," + read_register_values(i, 25201, 80)
-    stats_line_all += "," + read_register_values(i, 20109, 19)
-    stats_line_all += "," + read_register_values(i, 109, 6)
-    send_data(stats_line_all)
+    i.serial.close_port_after_each_call = True # Help reset bus for some USB-RS485 converters
+
+    try:
+        # 1. Read Main Stats
+        chunk1 = read_register_values(i, 25201, 75)
+        time.sleep(0.1)
+
+        # 2. Read Config/Mode
+        chunk2 = read_register_values(i, 20109, 20)
+        time.sleep(0.1)
+
+        # 3. Read MPPT/Charger
+        chunk3 = read_register_values(i, 15201, 19)
+        time.sleep(0.1)
+
+        # 4. Read BMS
+        chunk4 = read_register_values(i, 109, 6)
+        time.sleep(0.1)
+
+        # Combine all strings
+        stats_line_all = ",".join(filter(None, [chunk1, chunk2, chunk3, chunk4]))
+        send_data(stats_line_all)
+
+    except minimalmodbus.NoResponseError:
+        logging.error("Inverter failed to respond to a request chunk.")
+    except Exception as e:
+        logging.error(f"Unexpected error: {e}")
 
 
     # infinite = False
