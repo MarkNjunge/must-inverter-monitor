@@ -71,3 +71,53 @@ Then restart your terminal or run this:
 ```shell
 newgrp dialout
 ```
+
+## Docker
+
+The app is compatible with docker.
+
+> Only tested on Linux (Fedora, Rasberry Pi)
+
+```shell
+docker build -t must-inverter-monitor .
+
+# ARM compatible
+docker buildx build --platform linux/amd64,linux/arm64 -t must-inverter-monitor .
+```
+
+The [docker-compose.yml](docker-compose.yml) provides a sample, but some changes will be needed depending on your setup.
+
+Setup the logs directory:
+
+```shell
+# Get your <user_id>
+id -u
+
+# Get your <group_id>
+id -g
+
+# Create the logs dir
+mkdir -p /opt/must-inverter/logs
+
+# Update the ownership
+chown <user_id>:<group_id> /opt/must-inverter/logs
+```
+
+Get the `<group_id>` for `/dev/ttyUSB0`. This is **not** expected to be the same as your user's group. 
+
+```shell
+# Get the dialout <group_id>
+getent group dialout
+
+# If the above fails, get the id from /dev/ttyUSB0
+ls -n /dev/ttyUSB0 | awk '{print $4}'
+```
+
+Update the `docker-compose.yml`:
+- Replace `<user_id>` with **your** user id.
+- Replace `<group_id>` with the group id for `/dev/ttyUSB0`
+
+```yaml
+# e.g
+user: "1000:18"
+```

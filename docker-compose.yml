@@ -1,0 +1,13 @@
+services:
+  must-inverter-monitor:
+    image: must-inverter-monitor
+    container_name: must-inverter-monitor
+    restart: unless-stopped
+    user: "<user_id>:<group_id>"
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+    volumes:
+      - /opt/must-inverter/logs:/app/logs
+    environment:
+      - UV_CACHE_DIR=/tmp/uv-cache
+      - SERPORT=/dev/ttyUSB0
