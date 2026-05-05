@@ -22,12 +22,14 @@ logging.basicConfig(
     ],
 )
 
-SERPORT = os.getenv("SERPORT")
-SERTIMEOUT = float(os.getenv("SERTIMEOUT"))
-SERBAUD = int(os.getenv("SERBAUD"))
+SERPORT = os.getenv("SERPORT", "/dev/ttyUSB0")
+SERTIMEOUT = float(os.getenv("SERTIMEOUT", "0.5"))
+SERBAUD = int(os.getenv("SERBAUD", "19200"))
 
-INTERVAL = int(os.getenv("INTERVAL"))
+INTERVAL = int(os.getenv("INTERVAL", "1"))
+INFINITE = os.getenv("INFINITE", "true").lower() == "true"
 
+INFLUX_ENABLED = os.getenv("INFLUX_ENABLED", "true").lower() == "true"
 INFLUX_HOST = os.getenv("INFLUX_HOST")
 INFLUX_ORGID = os.getenv("INFLUX_ORGID")
 INFLUX_BUCKET = os.getenv("INFLUX_BUCKET")
@@ -219,43 +221,36 @@ register_map = {
 }
 
 
-def read_register_values(i, startreg, count):
-    stats_line = ""
-
+def read_register_values(instrument: minimalmodbus.Instrument, startreg: int, count: int) -> dict[str, str | float]:
+    data: dict[str, str | float] = {}
     register_id = startreg
-    results = i.read_registers(startreg, count)
+    results = instrument.read_registers(startreg, count)
     for r in results:
         if register_id in register_map:
             r_key = register_map[register_id][0]
             r_unit = register_map[register_id][2]
-
             if register_map[register_id][3] == "map":
-                r_value = '"' + register_map[register_id][4][r] + '"'
+                r_value: str | float = register_map[register_id][4][r]
             else:
-                r_value = str(round(r * r_unit, 2))
-
-            # convert from offset val fix for Inverter power overload
-            if register_id == 25213 or register_id == 25273 or register_id == 25274 or register_id == 25214 or register_id == 110 :
-                if float(r_value) > 32000 :
-                   r_value =- abs(float(r_value)- 65536)
-
-
-            stats_line += r_key + "=" + str(r_value) + ","
-
+                r_value = round(r * r_unit, 2)
+                # Convert from unsigned to signed for registers that can report negative values
+                if register_id in (25213, 25273, 25274, 25214, 110):
+                    if r_value > 32000:
+                        r_value = r_value - 65536
+            data[r_key] = r_value
         register_id += 1
-
-    # Remove comma at the end
-    stats_line = stats_line[:-1]
-
-    return stats_line
+    return data
 
 
-def send_data(stats):
+def send_data_influx(stats: dict[str, str | float]) -> None:
     url = "{}/api/v2/write?orgID={}&bucket={}".format(
         INFLUX_HOST, INFLUX_ORGID, INFLUX_BUCKET
     )
-    data = "inverter " + stats + " " + str(time.time_ns())
-
+    fields = ",".join(
+        f'{k}="{v}"' if isinstance(v, str) else f"{k}={v}"
+        for k, v in stats.items()
+    )
+    data = f"inverter {fields} {time.time_ns()}"
     logging.info(data)
     r = requests.post(
         url,
@@ -265,45 +260,45 @@ def send_data(stats):
             "Authorization": "Token " + INFLUX_TOKEN,
         },
     )
-    logging.info(f"{r.status_code} {r.text}")
+    logging.info(f"influx status_code={r.status_code} text={r.text}")
 
-
-infinite = True
-
-while infinite:
-    i = minimalmodbus.Instrument(SERPORT, 4)
-    i.serial.timeout = SERTIMEOUT
-    i.serial.baudrate = SERBAUD
-    i.serial.close_port_after_each_call = True # Help reset bus for some USB-RS485 converters
+def run_loop():
+    instrument = minimalmodbus.Instrument(SERPORT, 4)
+    instrument.serial.timeout = SERTIMEOUT
+    instrument.serial.baudrate = SERBAUD
+    instrument.serial.close_port_after_each_call = True # Help reset bus for some USB-RS485 converters
 
     try:
         # 1. Read Main Stats
-        chunk1 = read_register_values(i, 25201, 75)
+        chunk1 = read_register_values(instrument, 25201, 75)
         time.sleep(0.1)
 
         # 2. Read Config/Mode
-        chunk2 = read_register_values(i, 20109, 20)
+        chunk2 = read_register_values(instrument, 20109, 20)
         time.sleep(0.1)
 
         # 3. Read MPPT/Charger
-        chunk3 = read_register_values(i, 15201, 19)
+        chunk3 = read_register_values(instrument, 15201, 19)
         time.sleep(0.1)
 
         # 4. Read BMS
-        chunk4 = read_register_values(i, 109, 6)
+        chunk4 = read_register_values(instrument, 109, 6)
         time.sleep(0.1)
 
-        # Combine all strings
-        stats_line_all = ",".join(filter(None, [chunk1, chunk2, chunk3, chunk4]))
-        send_data(stats_line_all)
+        stats = {**chunk1, **chunk2, **chunk3, **chunk4}
+        logging.info(stats)
+
+        if INFLUX_ENABLED:
+            send_data_influx(stats)
 
     except minimalmodbus.NoResponseError:
         logging.error("Inverter failed to respond to a request chunk.")
     except Exception as e:
         logging.error(f"Unexpected error: {e}")
 
+if __name__ == "__main__":
+    run_loop()
 
-    # infinite = False
-
-    if infinite:
+    while INFINITE:
         time.sleep(INTERVAL)
+        run_loop()

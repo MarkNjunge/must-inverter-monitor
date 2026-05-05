@@ -1,15 +1,15 @@
 # must-inverter-monitor
 
-Monitor a MUST inverter and send the stats to InfluxDB.
+Monitor a MUST inverter and send the stats to InfluxDB (InfluxDB OSS v2).
 
 Tested on a PV-1800.
 
 Original code from [andremiller/must-inverter-python-monitor](https://github.com/andremiller/must-inverter-python-monitor)
 
-## Requirements
+## Dependencies
 
 - [uv](https://docs.astral.sh/uv/)
-- InfluxDB
+- InfluxDB (Optional)
 
 ## Installation
 
@@ -24,6 +24,21 @@ Create a .env file
 ```
 cp .env.sample .env
 ```
+
+## Configuration
+
+| Variable         | Description                                                                    | Default |
+|------------------|--------------------------------------------------------------------------------|---------|
+| `SERPORT`        | Serial port for the inverter (e.g. `COM3` in Windows, `/dev/ttyUSB0` in Linux) | `COM3`  |
+| `SERTIMEOUT`     | Serial port read timeout in seconds                                            | `0.5`   |
+| `SERBAUD`        | Serial baud rate                                                               | `19200` |
+| `INTERVAL`       | Seconds between each reading                                                   | `1`     |
+| `INFINITE`       | Set to `false` to run once and exit                                            | `true`  |
+| `INFLUX_ENABLED` | Enable sending to InfluxDB                                                     | `false` |
+| `INFLUX_HOST`    | InfluxDB host URL                                                              | —       |
+| `INFLUX_ORGID`   | InfluxDB organisation ID                                                       | —       |
+| `INFLUX_BUCKET`  | InfluxDB bucket name                                                           | —       |
+| `INFLUX_TOKEN`   | InfluxDB API token                                                             | —       |
 
 ## Usage
 
